@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.ssafy.happyhouse.repo.InterestedRepo">
+	<resultMap type="com.ssafy.happyhouse.vo.AptVO" id="aptVO">
+		<id column="aptCode" property="aptCode"/>
+		<id column="aptName" property="aptName"/>
+		<id column="dongCode" property="dongCode"/>
+		<id column="dongName" property="dongName"/>
+		<id column="buildYear" property="buildYear"/>
+		<id column="jibun" property="jibun"/>
+		<id column="lat" property="lat"/>
+		<id column="lng" property="lng"/>
+		<id column="roadName" property="roadName"/>
+		<id column="roadNameBonbun" property="roadNameBonbun"/>
+		<id column="roadNameBubun" property="roadNameBubun"/>
+	</resultMap>
+
+	<select id="getInterested" resultMap="aptVO" parameterType="String">
+		select h.aptCode, h.aptName, h.dongCode, h.dongName, h.buildYear, h.jibun, h.lat, h.lng, h.roadName,
+				h.roadNameBonbun, h.roadNameBubun
+		from interested i left join houseinfo h
+		on h.aptCode = i.aptCode
+		where i.username = #{username}
+		order by i.no desc;
+	</select>
+
+	<insert id="addInterested" parameterType="String">
+		insert into interested (username, aptCode)
+		values (#{username}, #{aptCode});
+	</insert>
+	
+	<delete id="deleteInterested" parameterType="String">
+		delete from interested
+		where username = #{username} and aptCode = #{aptCode};
+	</delete>
+</mapper>

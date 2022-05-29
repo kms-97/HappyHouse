@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.ssafy.happyhouse.repo.AptRepo">
+
+	<select id="getAllAptList" resultType="com.ssafy.happyhouse.vo.AptVO">
+		select * from houseinfo;
+	</select>
+	
+	<select id="getAptList" parameterType="String" resultType="com.ssafy.happyhouse.vo.AptVO">
+		select * from houseinfo
+		where dongCode = #{dongCode};
+	</select>
+	
+	<select id="getAptByAptName" parameterType="String" resultType="com.ssafy.happyhouse.vo.AptVO">
+		select * from houseinfo
+		where aptName like CONCAT('%', #{name}, '%')
+	</select>
+	
+	<select id="getAptByAptCode" parameterType="String" resultType="com.ssafy.happyhouse.vo.AptVO">
+		select * from houseinfo
+		where aptCode = #{code};
+	</select>
+	
+	<select id="getAptByDongName" parameterType="String" resultType="com.ssafy.happyhouse.vo.AptVO">
+		select * from houseinfo
+		where dongName like CONCAT('%', #{name}, '%')
+	</select>
+
+	<resultMap type="com.ssafy.happyhouse.vo.DealVO" id="dealVO">
+		<id column="dealAmount" property="dealAmount"/>
+		<id column="dealYear" property="dealYear"/>
+		<id column="dealMonth" property="dealMonth"/>
+		<id column="dealDay" property="dealDay"/>
+		<id column="area" property="area"/>
+		<id column="floor" property="floor"/>
+	</resultMap>
+	
+	<resultMap type="com.ssafy.happyhouse.dto.DealHistoryDto" id="dealHistory">
+		<id column="aptCode" property="aptCode"/>
+		<id column="aptName" property="aptName"/>
+		<id column="sidoName" property="sidoName"/>
+		<id column="gugunName" property="gugunName"/>
+		<id column="dongName" property="dongName"/>
+		<id column="jibun" property="jibun"/>
+		<id column="roadName" property="roadName"/>
+		<id column="roadNameBonbun" property="roadNameBonbun"/>
+		<id column="roadNameBubun" property="roadNameBubun"/>
+		<id column="lat" property="lat"/>
+		<id column="lng" property="lng"/>
+		<collection resultMap="dealVO" property="history"/>
+	</resultMap>
+	
+	<select id="getDealHistory" resultMap="dealHistory">
+		select h.aptCode, h.aptName, h.jibun, h.roadName, h.roadNameBonbun, h.roadNameBubun, h.lat, h.lng,
+				l.sidoName, l.gugunName, l.dongName,
+				d.dealAmount, d.dealYear, d.dealMonth, d.dealDay, d.area, d.floor
+		from houseinfo h
+		left join dongcode l
+		on h.dongCode = l.dongCode
+		left outer join housedeal d
+		on h.aptCode = d.aptCode
+		where h.aptCode = #{aptCode}
+		and d.cancelDealType != "O";
+	</select>
+	
+	<select id="getAptByKeyword" parameterType="String" resultType="com.ssafy.happyhouse.vo.AptVO">
+		select * from houseinfo
+		where aptName like CONCAT('%', #{keyword}, '%') or dongName like CONCAT('%', #{keyword}, '%');
+	</select>
+	
+	<resultMap type="com.ssafy.happyhouse.vo.AptVO" id="aptVO">
+		<id column="aptCode" property="aptCode"/>
+		<id column="aptName" property="aptName"/>
+		<id column="aptDongCode" property="dongCode"/>
+		<id column="aptDongName" property="dongName"/>
+		<id column="buildYear" property="buildYear"/>
+		<id column="jibun" property="jibun"/>
+		<id column="lat" property="lat"/>
+		<id column="lng" property="lng"/>
+		<id column="roadName" property="roadName"/>
+		<id column="roadNameBonbun" property="roadNameBonbun"/>
+		<id column="roadNameBubun" property="roadNameBubun"/>
+	</resultMap>
+	
+	<resultMap type="com.ssafy.happyhouse.dto.RandomAptDto" id="randomAptDto">
+		<id column="dongCode" property="dongCode"/>
+		<id column="sidoName" property="sidoName"/>
+		<id column="gugunName" property="gugunName"/>
+		<id column="dongName" property="dongName"/>
+		<collection resultMap="aptVO" property="randomApt"/>
+	</resultMap>
+	
+	<select id="getRandomApt" resultMap="randomAptDto">
+		select l.dongCode as dongCode, l.sidoName as sidoName, l.gugunName as gugunName, l.dongName as dongName,
+				h.aptCode as aptCode, h.aptName as aptName, h.buildYear as buildYear, h.jibun as jibun, h.lat as lat, h.lng as lng, h.roadName as roadName,
+				h.roadNameBonbun as roadNameBonbun, h.roadNameBubun as roadNameBubun, h.dongCode as aptDongCode, h.dongName as aptDongName
+		from houseinfo h right join dongcode l
+		on l.dongCode = h.dongCode
+		where l.dongCode = #{dongCode}
+		limit #{num};
+	</select>
+</mapper>

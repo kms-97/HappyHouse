@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.ssafy.happyhouse.repo.CodeRepo">
+	
+	<select id="getSido" resultType="com.ssafy.happyhouse.vo.SidoVO">
+		select * from sidoCode;
+	</select>
+	
+	<select id="getGugun" parameterType="String" resultType="com.ssafy.happyhouse.vo.GugunVO">
+		select * from gugunCode
+		 where left(gugunCode, 2) = left(#{sidoCode}, 2)
+		 order by gugunName
+	</select>
+		
+	<select id="getDong" parameterType="String" resultType="com.ssafy.happyhouse.vo.DongVO">
+		select * from dongCode
+		where left(dongCode, 5) = left(#{gugunCode}, 5)
+		order by dongName
+	</select>
+	
+	<select id="getAllDong" resultType="com.ssafy.happyhouse.vo.DongVO">
+		select * from dongCode
+	</select>
+	
+	<select id="getDongByKeyword" resultType="com.ssafy.happyhouse.vo.DongVO" parameterType="String">
+		select * from dongCode
+		where dongName is not null 
+		and (sidoName like CONCAT('%', #{keyword}, '%') or gugunName like CONCAT('%', #{keyword}, '%') or dongName like CONCAT('%', #{keyword}, '%'));
+	</select>
+	
+	<select id="getRandomDong" resultType="String">
+		select DISTINCT l.dongCode
+		from dongCode l
+		join houseinfo h
+		on l.dongCode = h.dongCode
+		where l.dongCode like '11%' and l.dongName is not null 
+		ORDER BY RAND()
+		LIMIT 1;
+	</select>
+</mapper>

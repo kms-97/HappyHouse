@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.ssafy.happyhouse.repo.BoardRepo">
+	<resultMap type="com.ssafy.happyhouse.dto.CommentDto" id="comments">
+		<id column="commentNo" property="no" />
+		<id column="commentId" property="writerId"/>
+		<id column="commentName" property="writerName"/>
+		<id column="commentTitle" property="title"/>
+		<id column="commentContent" property="content"/>
+		<id column="commentRegTime" property="regTime"/>
+	</resultMap>
+	
+	<resultMap type="com.ssafy.happyhouse.dto.BoardDto" id="board">
+		<id column="no" property="no"/>
+		<id column="type" property="type"/>
+		<id column="writerId" property="writerId"/>
+		<id column="writerName" property="writerName"/>
+		<id column="title" property="title"/>
+		<id column="content" property="content"/>
+		<id column="regTime" property="regTime"/>
+		<id column="cnt" property="commentNo"/>
+		<collection resultMap="comments" property="comments"/>
+	</resultMap>
+
+	<select id="getAllBoard" resultMap="board">
+		select b.no, b.type, b.writer_id as writerId, (select u.nickname from user u where u.username = b.writer_id) as writerName, b.title, b.content, b.regTime, (select count(*) from comment where c.board_no = b.no) as cnt,
+				c.no as commentNo, c.writer_id as commentId, (select u.nickname from user u where u.username = c.writer_id) as commentName, c.title as commentTitle, c.content as commentContent, c.regTime as commentRegTime
+		from board b 
+		left outer join comment c on b.no = c.board_no
+		order by b.regTime desc
+	</select>
+
+	<insert id="registBoard" parameterType="com.ssafy.happyhouse.vo.BoardVO">
+		insert into board (type, writer_id, title, content, regtime)
+		values (#{type}, #{writerId}, #{title}, #{content}, now());
+	</insert>
+	
+	<delete id="deleteBoard" parameterType="int">
+		delete from board where no = #{no};
+	</delete>
+	
+	<update id="modifyBoard" parameterType="com.ssafy.happyhouse.vo.BoardVO">
+		update board
+		set title = #{title}, content = #{content}
+		where no = #{no};
+	</update>
+</mapper>

@@ -1,0 +1,2 @@
+export const kakao = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.VUE_APP_KAKAOREST}&redirect_uri=${process.env.VUE_APP_KAKAOREDIRECT}&response_type=code`
+export const naver = `https://nid.naver.com/oauth2.0/authorize?client_id=${process.env.VUE_APP_NAVERID}&redirect_uri=${process.env.VUE_APP_NAVERREDIRECT}&response_type=code&stae=${process.env.VUE_APP_NAVERSTATE}`
